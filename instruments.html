@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ألعاب عربية: آلات موسيقية</title>
+
+  <!-- Almarai -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+
+      /* Fallback tint under background image */
+      --cardSolid:#8fcbbd;
+      --cardBorder:#1c8f52;
+
+      --text:#102030;
+      --muted: rgba(16,32,48,.72);
+
+      --pillBg: rgba(143,203,189,.25);
+      --pillBorder: rgba(28,143,82,.22);
+
+      --btnBg: rgba(255,255,255,.55);
+      --btnBgHover: rgba(255,255,255,.82);
+      --btnBorder: rgba(16,32,48,.16);
+
+      --chipBg: rgba(255,255,255,.60);
+      --chipBgHover: rgba(255,255,255,.78);
+      --chipBorder: rgba(16,32,48,.18);
+
+      --ok:#16a34a;
+      --bad:#dc2626;
+
+      --shadow: 0 18px 40px rgba(16,32,48,.16);
+      --softShadow: 0 10px 22px rgba(16,32,48,.12);
+
+      /* Injected via JS as url("...backgroundimage.svg") */
+      --cardBgImage: none;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:"Almarai", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--text);
+      padding:24px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{ width:min(1100px, 100%); }
+
+    header{
+      direction:ltr;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .brand{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      min-width:280px;
+    }
+    .logo{
+      width:52px;height:52px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid rgba(16,32,48,.16);
+      box-shadow:var(--softShadow);
+      object-fit:contain;
+      padding:8px;
+    }
+    .title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin-top:6px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .hud{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+    .pill{
+      direction:ltr;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      border:1px solid var(--pillBorder);
+      background:var(--pillBg);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:13px;
+      color: rgba(16,32,48,.75);
+      white-space:nowrap;
+      backdrop-filter: blur(2px);
+    }
+    .pill strong{ color:var(--text); }
+
+    .progressTrack{
+      height:8px;
+      border-radius:999px;
+      background: rgba(143,203,189,.35);
+      border:1px solid var(--pillBorder);
+      overflow:hidden;
+      margin:10px 0 14px;
+    }
+    .progressBar{
+      height:100%;
+      width:0%;
+      background: rgba(28,143,82,.55);
+      transition: width .25s ease;
+    }
+
+    .card{
+      border-radius:20px;
+      border:2px solid var(--cardBorder);
+      box-shadow:var(--shadow);
+      padding:16px;
+      overflow:hidden;
+      transition: background .2s ease, border-color .2s ease;
+
+      background-color: var(--cardSolid);
+      background-image: var(--cardBgImage);
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+    }
+    .card.correct{
+      border-color:var(--ok);
+      background-color: color-mix(in oklab, var(--cardSolid) 75%, var(--ok));
+    }
+    .card.incorrect{
+      border-color:var(--bad);
+      background-color: color-mix(in oklab, var(--cardSolid) 75%, var(--bad));
+    }
+
+    .cardTop{
+      direction:ltr;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .chipLabel{
+      display:inline-flex;
+      align-items:center;
+      border:1px solid rgba(16,32,48,.18);
+      background:rgba(255,255,255,.55);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:800;
+      color: rgba(16,32,48,.75);
+      white-space:nowrap;
+      backdrop-filter: blur(2px);
+    }
+    .badge{
+      display:none;
+      border:1px solid rgba(16,32,48,.18);
+      background: rgba(255,255,255,.65);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+      align-items:center;
+      gap:8px;
+      backdrop-filter: blur(2px);
+    }
+    .card.correct .badge,
+    .card.incorrect .badge{ display:inline-flex; }
+
+    .q{
+      direction:rtl;
+      text-align:right;
+      margin:0;
+      font-size:19px;
+      font-weight:800;
+      line-height:1.45;
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+    }
+    .support{
+      direction:rtl;
+      text-align:right;
+      margin-top:6px;
+      font-size:14px;
+      font-weight:700;
+      color: rgba(16,32,48,.75);
+      line-height:1.5;
+      text-shadow: 0 1px 0 rgba(255,255,255,.18);
+    }
+
+    .panel{
+      margin-top:12px;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:10px;
+      backdrop-filter: blur(3px);
+    }
+    .panelTitle{
+      direction:ltr;
+      font-size:12px;
+      font-weight:800;
+      color: rgba(16,32,48,.75);
+      margin:0 0 8px;
+      letter-spacing:.2px;
+    }
+
+    .wordChips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      direction:rtl;
+      justify-content:flex-start;
+    }
+    .word{
+      border-radius:14px;
+      border:1px solid var(--chipBorder);
+      background: var(--chipBg);
+      padding:9px 10px;
+      font-weight:800;
+      cursor:grab;
+      user-select:none;
+      box-shadow: 0 8px 18px rgba(16,32,48,.08);
+      font-size:15px;
+      white-space:nowrap;
+    }
+    .word:hover{ background: var(--chipBgHover); }
+    .word[aria-disabled="true"]{ opacity:.65; cursor:not-allowed; box-shadow:none; }
+
+    .btn{
+      font-family:"Almarai", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      border-radius:16px;
+      border:1px solid var(--btnBorder);
+      background:var(--btnBg);
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      backdrop-filter: blur(2px);
+    }
+    .btn:hover{ background:var(--btnBgHover); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
+    .btn .ico{ width:18px; height:18px; opacity:.9; }
+
+    .btnBig{
+      width:100%;
+      justify-content:space-between;
+      padding:14px 14px;
+      border-radius:18px;
+    }
+    .btnBig .right{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      direction:rtl;
+      text-align:right;
+    }
+    .btnBig .name{
+      font-size:16px;
+      font-weight:900;
+    }
+    .btnBig .desc{
+      font-size:12px;
+      font-weight:800;
+      color: rgba(16,32,48,.70);
+      margin-top:2px;
+      line-height:1.35;
+    }
+
+    .actions{
+      direction:ltr;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .helper{
+      direction:rtl;
+      font-size:13px;
+      font-weight:800;
+      color: rgba(16,32,48,.75);
+      text-align:right;
+    }
+
+    /* Card 1 grid */
+    .grid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:10px;
+      direction:ltr;
+    }
+    @media (max-width: 980px){ .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px){ .grid{ grid-template-columns: 1fr; } }
+
+    .tile{
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:14px;
+      padding:10px;
+      backdrop-filter: blur(3px);
+    }
+    .imgBox{
+      width:100%;
+      height:140px;
+      border-radius:12px;
+      border:1px solid rgba(16,32,48,.18);
+      background: rgba(255,255,255,.70);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-shadow: 0 8px 18px rgba(16,32,48,.08);
+    }
+    .imgBox img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      padding:10px;
+    }
+
+    .dropSlot{
+      margin-top:8px;
+      direction:rtl;
+      border-radius:14px;
+      background: rgba(255,255,255,.70);
+      border:2px dashed rgba(16,32,48,.22);
+      padding:10px;
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .dropSlot.dragover{
+      border-color: rgba(28,143,82,.65);
+      background: rgba(255,255,255,.92);
+    }
+    .slotText{ font-size:16px; font-weight:800; }
+    .returnBtn{
+      font-family:"Almarai", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-weight:800;
+      font-size:12px;
+      border:1px solid var(--btnBorder);
+      background: rgba(255,255,255,.65);
+      border-radius:12px;
+      padding:6px 10px;
+      cursor:pointer;
+      backdrop-filter: blur(2px);
+    }
+
+    /* Card 2: letters */
+    .scrambleWrap{ margin-top:12px; display:grid; gap:12px; }
+    .lettersArea{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      direction:ltr;
+    }
+    @media (max-width: 900px){ .lettersArea{ grid-template-columns: 1fr; } }
+    .box{
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:12px;
+      min-height:150px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      backdrop-filter: blur(3px);
+    }
+    .boxHead{
+      direction:rtl;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .boxTitle{ font-weight:900; font-size:14px; }
+    .boxHint{ font-size:12px; font-weight:800; color: rgba(16,32,48,.65); }
+    .dropLine{
+      border:2px dashed rgba(16,32,48,.22);
+      border-radius:14px;
+      background: rgba(255,255,255,.65);
+      padding:10px;
+      flex:1;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      direction: rtl;
+      min-height:74px;
+    }
+    .dropLine.dragover{
+      border-color: rgba(28,143,82,.65);
+      background: rgba(255,255,255,.92);
+    }
+    .letter{
+      border-radius:12px;
+      border:1px solid var(--chipBorder);
+      background: rgba(255,255,255,.72);
+      padding:10px 12px;
+      font-weight:900;
+      font-size:20px;
+      cursor:grab;
+      user-select:none;
+      box-shadow: 0 8px 18px rgba(16,32,48,.08);
+    }
+    .miniRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      direction:rtl;
+    }
+    .miniPill{
+      direction:ltr;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--pillBorder);
+      background:var(--pillBg);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:900;
+      color: rgba(16,32,48,.78);
+      white-space:nowrap;
+      backdrop-filter: blur(2px);
+    }
+    .wordImageWrap{
+      margin-top:10px;
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+      align-items:center;
+      direction:rtl;
+      flex-wrap:wrap;
+    }
+    .wordImage{
+      width:170px;
+      height:170px;
+      border-radius:18px;
+      border:1px solid rgba(16,32,48,.18);
+      background: rgba(255,255,255,.86);
+      object-fit:contain;
+      padding:12px;
+      box-shadow: 0 12px 26px rgba(16,32,48,.12);
+      flex:0 0 auto;
+    }
+    .imgCaption{
+      font-size:13px;
+      font-weight:900;
+      color: rgba(16,32,48,.70);
+      max-width:280px;
+    }
+    .hintRow{
+      display:none;
+      direction:rtl;
+      align-items:center;
+      gap:10px;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.55);
+      border-radius:16px;
+      padding:10px;
+      margin-top:10px;
+      backdrop-filter: blur(3px);
+    }
+    .hintRow.show{ display:flex; }
+    .hintLabel{ font-size:12px; font-weight:900; color: rgba(16,32,48,.65); }
+    .hintWord{ font-size:18px; font-weight:900; }
+
+    /* Card 3: Fill in blank (drag) */
+    .blankCard{
+      margin-top:12px;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:12px;
+      backdrop-filter: blur(3px);
+    }
+    .sentenceRow{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      direction:rtl;
+    }
+    .sentenceImg{
+      width:130px;
+      height:130px;
+      border-radius:18px;
+      border:1px solid rgba(16,32,48,.18);
+      background: rgba(255,255,255,.86);
+      object-fit:contain;
+      padding:10px;
+      box-shadow: 0 12px 26px rgba(16,32,48,.12);
+      flex:0 0 auto;
+    }
+    .blankLine{
+      direction:rtl;
+      text-align:right;
+      font-size:18px;
+      font-weight:900;
+      line-height:1.8;
+      flex:1 1 360px;
+      min-width:min(700px, 100%);
+    }
+    .blankSlot{
+      display:inline-flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      min-width:160px;
+      padding:8px 10px;
+      border-radius:14px;
+      background: rgba(255,255,255,.75);
+      border:2px dashed rgba(16,32,48,.22);
+      vertical-align:middle;
+      margin:0 6px;
+    }
+    .blankSlot.dragover{
+      border-color: rgba(28,143,82,.65);
+      background: rgba(255,255,255,.92);
+    }
+    .blankValue{
+      font-size:16px;
+      font-weight:900;
+      min-height:22px;
+    }
+
+    /* ===== Card 7: Memory / Flip ===== */
+    .memoryWrap{
+      margin-top:12px;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:12px;
+      backdrop-filter: blur(3px);
+    }
+    .memoryGrid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap:10px;
+      direction:ltr;
+    }
+    @media (max-width: 1020px){ .memoryGrid{ grid-template-columns: repeat(5, 1fr);} }
+    @media (max-width: 820px){ .memoryGrid{ grid-template-columns: repeat(4, 1fr);} }
+    @media (max-width: 560px){ .memoryGrid{ grid-template-columns: repeat(3, 1fr);} }
+
+    .card3d{
+      position:relative;
+      width:100%;
+      aspect-ratio: 1 / 1;
+      border-radius:16px;
+      perspective: 900px;
+    }
+    .flipBtn{
+      all:unset;
+      display:block;
+      width:100%;
+      height:100%;
+      cursor:pointer;
+      border-radius:16px;
+      position:relative;
+    }
+    .flipBtn:focus-visible{
+      outline:3px solid rgba(28,143,82,.65);
+      outline-offset:3px;
+    }
+    .inner3d{
+      position:absolute;
+      inset:0;
+      border-radius:16px;
+      transform-style: preserve-3d;
+      transition: transform .35s ease;
+      box-shadow: 0 10px 22px rgba(16,32,48,.12);
+    }
+    .isFlipped .inner3d{ transform: rotateY(180deg); }
+    html[dir="rtl"] .isFlipped .inner3d{ transform: rotateY(-180deg); }
+
+    .face3d{
+      position:absolute;
+      inset:0;
+      border-radius:16px;
+      backface-visibility:hidden;
+      overflow:hidden;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
+    }
+    .front3d{
+      background: rgba(255,255,255,.35);
+      border:2px dashed rgba(16,32,48,.22);
+    }
+    .front3d .mark{
+      width:44px; height:44px;
+      border-radius:14px;
+      border:1px solid rgba(16,32,48,.18);
+      background: rgba(255,255,255,.70);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      font-size:18px;
+    }
+    .back3d{
+      transform: rotateY(180deg);
+      background: rgba(255,255,255,.72);
+    }
+    html[dir="rtl"] .back3d{ transform: rotateY(-180deg); }
+
+    .backWord{
+      direction:rtl;
+      text-align:center;
+      font-weight:900;
+      font-size:18px;
+      line-height:1.2;
+      padding:8px 6px;
+    }
+    .backImg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      padding:10px;
+    }
+    .matched .inner3d{
+      box-shadow: 0 14px 30px rgba(22,163,74,.22);
+    }
+    .matched .face3d{
+      border-color: rgba(22,163,74,.65);
+    }
+
+    /* Score Card */
+    .scoreGrid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
+      direction:ltr;
+    }
+    @media (max-width: 980px){ .scoreGrid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 640px){ .scoreGrid{ grid-template-columns: 1fr; } }
+
+    .scoreBox{
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.55);
+      border-radius:16px;
+      padding:12px;
+      box-shadow: 0 10px 22px rgba(16,32,48,.10);
+      direction:rtl;
+      backdrop-filter: blur(3px);
+    }
+    .scoreLabel{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(16,32,48,.65);
+      margin-bottom:6px;
+    }
+    .scoreValue{
+      font-size:22px;
+      font-weight:900;
+    }
+    .bigCongrats{
+      margin-top:10px;
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.55);
+      border-radius:16px;
+      padding:12px;
+      direction:rtl;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      backdrop-filter: blur(3px);
+    }
+    .bigCongrats strong{ font-size:18px; }
+
+    /* ===== Card 0: Game Picker ===== */
+    .pickGrid{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap:10px;
+      direction:ltr;
+    }
+    @media (max-width: 860px){ .pickGrid{ grid-template-columns: 1fr; } }
+    .pickBox{
+      border:1px solid rgba(16,32,48,.16);
+      background: rgba(255,255,255,.35);
+      border-radius:16px;
+      padding:12px;
+      backdrop-filter: blur(3px);
+      direction:rtl;
+    }
+    .pickBoxTitle{
+      font-weight:900;
+      margin:0 0 6px;
+      font-size:14px;
+      color: rgba(16,32,48,.75);
+    }
+    .pickHint{
+      margin:0 0 10px;
+      font-size:12px;
+      font-weight:800;
+      color: rgba(16,32,48,.65);
+      line-height:1.35;
+    }
+    .btnStack{
+      display:grid;
+      gap:10px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img class="logo" id="logoImg" alt="Logo" />
+      <div>
+        <h1 class="title" id="pageTitle">ألعاب: آلات موسيقية</h1>
+        <div class="subtitle">اختر نوع اللعبة، أو العب بالترتيب (مطابقة → حروف → فراغ → ذاكرة → نتائج).</div>
+      </div>
+    </div>
+
+    <div class="hud">
+      <div class="pill">Card: <strong id="cardIndexText">1/6</strong></div>
+      <div class="pill">Progress: <strong id="placedText">0/7</strong></div>
+      <div class="pill">Score: <strong id="scoreText">0</strong></div>
+    </div>
+  </header>
+
+  <div class="progressTrack"><div class="progressBar" id="progressBar"></div></div>
+
+  <!-- CARD 0 (Picker) -->
+  <section class="card" id="card0">
+    <div class="cardTop">
+      <div class="chipLabel">Start</div>
+      <div class="badge" id="badge0">—</div>
+    </div>
+
+    <p class="q">اختر نوع اللعبة</p>
+    <div class="support">يمكنك بدء أي لعبة مباشرة، أو اللعب بالترتيب الكامل.</div>
+
+    <div class="pickGrid">
+      <div class="pickBox">
+        <p class="pickBoxTitle">ابدأ لعبة واحدة</p>
+        <p class="pickHint">اضغط لعبة من القائمة. (يمكنك العودة لهذه الشاشة في أي وقت).</p>
+
+        <div class="btnStack">
+          <button class="btn btnBig" id="goMatchBtn">
+            <span class="right">
+              <span>
+                <div class="name">المطابقة (سحب كلمة → صورة)</div>
+                <div class="desc">اسحب الكلمات وضعها على الصور.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="arrow-right"></i>
+          </button>
+
+          <button class="btn btnBig" id="goLettersBtn">
+            <span class="right">
+              <span>
+                <div class="name">ترتيب الحروف</div>
+                <div class="desc">رتّب الحروف لتكوين الكلمة.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="arrow-right"></i>
+          </button>
+
+          <button class="btn btnBig" id="goBlankBtn">
+            <span class="right">
+              <span>
+                <div class="name">املأ الفراغ</div>
+                <div class="desc">اسحب الكلمة المناسبة للفراغ.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="arrow-right"></i>
+          </button>
+
+          <button class="btn btnBig" id="goMemoryBtn">
+            <span class="right">
+              <span>
+                <div class="name">الذاكرة (Flip Cards)</div>
+                <div class="desc">اقلب بطاقتين (صورة + كلمة) لإيجاد الزوج.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="arrow-right"></i>
+          </button>
+
+          <button class="btn btnBig" id="goScoreBtn">
+            <span class="right">
+              <span>
+                <div class="name">النتائج</div>
+                <div class="desc">شاهد بطاقة النتائج الحالية.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="pickBox">
+        <p class="pickBoxTitle">العب بالترتيب الكامل</p>
+        <p class="pickHint">هذه الطريقة تشغّل كل الألعاب بالترتيب ثم تعرض النتائج.</p>
+
+        <div class="btnStack">
+          <button class="btn btnBig" id="playAllBtn">
+            <span class="right">
+              <span>
+                <div class="name">ابدأ الآن</div>
+                <div class="desc">مطابقة → حروف → فراغ → ذاكرة → نتائج</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="play"></i>
+          </button>
+
+          <button class="btn btnBig" id="resetAllBtn0">
+            <span class="right">
+              <span>
+                <div class="name">إعادة كل شيء</div>
+                <div class="desc">إعادة تعيين الألعاب والإحصائيات.</div>
+              </span>
+            </span>
+            <i class="ico" data-lucide="refresh-ccw"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="helper" id="helper0">اختر لعبة من الأزرار.</div>
+      <button class="btn" id="quickStartBtn"><i class="ico" data-lucide="sparkles"></i> بدء سريع (المطابقة)</button>
+    </div>
+  </section>
+
+  <!-- CARD 1 -->
+  <section class="card" id="card1" style="display:none;">
+    <div class="cardTop">
+      <div class="chipLabel">Card 1</div>
+      <div class="badge" id="badge1">—</div>
+    </div>
+
+    <p class="q">اسحب الكلمات وضع كل كلمة على الصورة الصحيحة.</p>
+    <div class="support">مرّر على الكلمة لسماعها. ثم اضغط “تحقّق”.</div>
+
+    <div class="panel">
+      <div class="panelTitle">DRAG WORDS (HOVER TO HEAR)</div>
+      <div class="wordChips" id="wordChips1"></div>
+    </div>
+
+    <div class="grid" id="imgGrid"></div>
+
+    <div class="actions">
+      <button class="btn" id="checkBtn1" disabled><i class="ico" data-lucide="check-circle"></i> تحقّق</button>
+      <button class="btn" id="resetBtn1"><i class="ico" data-lucide="rotate-ccw"></i> إعادة</button>
+      <button class="btn" id="nextBtn1"><i class="ico" data-lucide="arrow-right"></i> التالي</button>
+      <button class="btn" id="homeBtn1"><i class="ico" data-lucide="home"></i> الرئيسية</button>
+      <div class="helper" id="helper1">ضع كل الكلمات أولاً.</div>
+    </div>
+  </section>
+
+  <!-- CARD 2 -->
+  <section class="card" id="card2" style="display:none;">
+    <div class="cardTop">
+      <div class="chipLabel">Card 2</div>
+      <div class="badge" id="badge2">—</div>
+    </div>
+
+    <p class="q">رتّب الحروف لتكوين الكلمة.</p>
+    <div class="support">اسحب الحروف إلى السطر. اضغط الحرف لإرجاعه. ثم اضغط “تحقّق”.</div>
+
+    <div class="wordImageWrap">
+      <img class="wordImage" id="wordImage2" alt="صورة الكلمة" />
+      <div class="imgCaption">انظر للصورة ثم رتّب الحروف. عند الإجابة الصحيحة ستسمع نطق الكلمة.</div>
+    </div>
+
+    <div class="hintRow" id="hintRow2">
+      <div>
+        <div class="hintLabel">تلميح (الكلمة):</div>
+        <div class="hintWord" id="hintWord2">—</div>
+      </div>
+    </div>
+
+    <div class="scrambleWrap">
+      <div class="miniRow">
+        <div class="miniPill" id="wordStep2">Word 1/7</div>
+        <div class="miniPill" id="answerText2">—</div>
+        <div class="miniPill" id="bankCount2">0</div>
+      </div>
+
+      <div class="lettersArea">
+        <div class="box">
+          <div class="boxHead">
+            <div class="boxTitle">حروف</div>
+            <div class="boxHint">اسحب هنا/هنا</div>
+          </div>
+          <div class="dropLine" id="lettersBank2"></div>
+        </div>
+
+        <div class="box">
+          <div class="boxHead">
+            <div class="boxTitle">السطر</div>
+            <div class="boxHint">ضع الحروف هنا</div>
+          </div>
+          <div class="dropLine" id="answerLine2"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="checkBtn2" disabled><i class="ico" data-lucide="check-circle"></i> تحقّق</button>
+        <button class="btn" id="resetBtn2"><i class="ico" data-lucide="rotate-ccw"></i> إعادة</button>
+        <button class="btn" id="nextWordBtn2" disabled><i class="ico" data-lucide="arrow-right"></i> التالي</button>
+        <button class="btn" id="backBtn2"><i class="ico" data-lucide="arrow-left"></i> رجوع</button>
+        <button class="btn" id="homeBtn2"><i class="ico" data-lucide="home"></i> الرئيسية</button>
+        <div class="helper" id="helper2">رتّب الحروف لتكوين الكلمة.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARD 3 -->
+  <section class="card" id="card3" style="display:none;">
+    <div class="cardTop">
+      <div class="chipLabel">Card 3</div>
+      <div class="badge" id="badge3">—</div>
+    </div>
+
+    <p class="q">املأ الفراغ: اسحب الكلمة الصحيحة وضعها في الفراغ.</p>
+    <div class="support">مرّر على الكلمة لسماعها. الصورة تظهر دائمًا بجانب الجملة.</div>
+
+    <div class="blankCard">
+      <div class="miniRow" style="margin-bottom:8px;">
+        <div class="miniPill" id="step3">Sentence 1/7</div>
+        <div class="miniPill" id="blankStatus3">—</div>
+      </div>
+
+      <div class="sentenceRow">
+        <img class="sentenceImg" id="sentenceImg3" alt="صورة الآلة" />
+        <div class="blankLine" id="sentence3"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panelTitle">WORD BANK (HOVER TO HEAR)</div>
+      <div class="wordChips" id="bank3"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="checkBtn3" disabled><i class="ico" data-lucide="check-circle"></i> تحقّق</button>
+      <button class="btn" id="resetBtn3"><i class="ico" data-lucide="rotate-ccw"></i> إعادة</button>
+      <button class="btn" id="nextBtn3" disabled><i class="ico" data-lucide="arrow-right"></i> التالي</button>
+      <button class="btn" id="backBtn3"><i class="ico" data-lucide="arrow-left"></i> رجوع</button>
+      <button class="btn" id="homeBtn3"><i class="ico" data-lucide="home"></i> الرئيسية</button>
+      <div class="helper" id="helper3">اسحب كلمة واحدة إلى الفراغ.</div>
+    </div>
+  </section>
+
+  <!-- CARD 7 (Memory / Flip) -->
+  <section class="card" id="card7" style="display:none;">
+    <div class="cardTop">
+      <div class="chipLabel">Card 7</div>
+      <div class="badge" id="badge7">—</div>
+    </div>
+
+    <p class="q">لعبة الذاكرة</p>
+    <div class="support">اقلب بطاقتين لإيجاد زوج (صورة + كلمة). عند التطابق ستسمع صوت الكلمة.</div>
+
+    <div class="memoryWrap">
+      <div class="miniRow">
+        <div class="miniPill" id="pairsPill7">Pairs 0/7</div>
+        <div class="miniPill" id="movesPill7">Moves 0</div>
+        <div class="miniPill" id="timePill7">Time 0s</div>
+      </div>
+
+      <div class="memoryGrid" id="memoryGrid7"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="restartBtn7"><i class="ico" data-lucide="rotate-ccw"></i> إعادة</button>
+      <button class="btn" id="revealBtn7"><i class="ico" data-lucide="eye"></i> كشف سريع</button>
+      <button class="btn" id="nextBtn7" disabled><i class="ico" data-lucide="arrow-right"></i> النتائج</button>
+      <button class="btn" id="backBtn7"><i class="ico" data-lucide="arrow-left"></i> رجوع</button>
+      <button class="btn" id="homeBtn7"><i class="ico" data-lucide="home"></i> الرئيسية</button>
+      <div class="helper" id="helper7">ابدأ بالضغط على بطاقة.</div>
+    </div>
+  </section>
+
+  <!-- SCORE CARD (last) -->
+  <section class="card" id="card4" style="display:none;">
+    <div class="cardTop">
+      <div class="chipLabel">Score Card</div>
+      <div class="badge" id="badge4">Done ✅</div>
+    </div>
+
+    <p class="q">نتائجك النهائية</p>
+    <div class="support">تشمل النتائج: المطابقة + ترتيب الحروف + املأ الفراغ + الذاكرة + المجموع.</div>
+
+    <div class="bigCongrats">
+      <div>
+        <div style="font-weight:900; font-size:12px; color:rgba(16,32,48,.65);">ملخص</div>
+        <strong id="summaryLine">—</strong>
+      </div>
+      <button class="btn" id="playAgainBtn"><i class="ico" data-lucide="refresh-ccw"></i> العب من البداية</button>
+      <button class="btn" id="homeBtnScore"><i class="ico" data-lucide="home"></i> الرئيسية</button>
+    </div>
+
+    <div class="scoreGrid">
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 1: أفضل مطابقة</div>
+        <div class="scoreValue" id="sc1Best">0/7</div>
+      </div>
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 1: محاولات التحقّق</div>
+        <div class="scoreValue" id="sc1Attempts">0</div>
+      </div>
+
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 2: كلمات مكتملة</div>
+        <div class="scoreValue" id="sc2Done">0/7</div>
+      </div>
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 2: دقّة التحقّق</div>
+        <div class="scoreValue" id="sc2Acc">0%</div>
+      </div>
+
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 3: جُمل مكتملة</div>
+        <div class="scoreValue" id="sc3Done">0/7</div>
+      </div>
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 3: دقّة التحقّق</div>
+        <div class="scoreValue" id="sc3Acc">0%</div>
+      </div>
+
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 7: Memory (Pairs)</div>
+        <div class="scoreValue" id="sc7Pairs">0/7</div>
+      </div>
+      <div class="scoreBox">
+        <div class="scoreLabel">Card 7: Moves / Time</div>
+        <div class="scoreValue" id="sc7MovesTime">0 • 0s</div>
+      </div>
+
+      <div class="scoreBox">
+        <div class="scoreLabel">المجموع (4 ألعاب)</div>
+        <div class="scoreValue" id="scCombined">0/28</div>
+      </div>
+      <div class="scoreBox">
+        <div class="scoreLabel">إجمالي المحاولات/الحركات</div>
+        <div class="scoreValue" id="scAttemptsAll">0</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="goCard1Btn"><i class="ico" data-lucide="arrow-left"></i> للمطابقة</button>
+      <button class="btn" id="goCard2Btn"><i class="ico" data-lucide="arrow-left"></i> للحروف</button>
+      <button class="btn" id="goCard3Btn"><i class="ico" data-lucide="arrow-left"></i> للفراغ</button>
+      <button class="btn" id="goCard7Btn"><i class="ico" data-lucide="arrow-left"></i> للذاكرة</button>
+      <div class="helper">إعادة اللعب تعيد كل شيء للصفر.</div>
+    </div>
+  </section>
+</div>
+
+<!-- Separate audio channels so hover doesn't interrupt feedback -->
+<audio id="audioCorrect" preload="auto"></audio>
+<audio id="audioIncorrect" preload="auto"></audio>
+<audio id="hoverAudio" preload="auto"></audio>
+<audio id="wordDoneAudio" preload="auto"></audio>
+<audio id="memoryWordAudio" preload="auto"></audio>
+
+<script>
+/* =========================================================
+   CONTENT CONFIG (matches GitHub filenames exactly)
+========================================================= */
+  const RAW_BASE_URL = "https://raw.githubusercontent.com/bubblesinarabic/musical-instruments/main/";
+  const LOGO_URL = RAW_BASE_URL + encodeURIComponent("BubblesinArabic.png");
+  const CARD_BG_IMAGE_FILE = "backgroundimage.svg";
+
+  // Order in this build: Card0 (picker) → Card1 → Card2 → Card3 → Card7 → Score
+  const TOTAL_CARDS = 6;
+
+  const FEEDBACK_AUDIO = {
+    correct: "أحسنت.mp3",
+    incorrect: "حاول مرة أخرى.mp3"
+  };
+
+  // Words WITHOUT diacritics (display)
+  const WORDS = ["العود","الدف","القانون","الكمان","الطبلة","الناي","الربابة"];
+
+  const CARD1_PAIRS = WORDS.map(w => ({ word: w, file: `${w}.svg` }));
+  const WORD_AUDIO = Object.fromEntries(WORDS.map(w => [w, `${w}.mp3`]));
+
+  const CARD2_WORDS = [...WORDS];
+  const CARD2_HINT_IMAGE = Object.fromEntries(WORDS.map(w => [w, `${w}.svg`]));
+
+  const CARD3_BANK_WORDS = [...WORDS];
+  const CARD3_ITEMS = [
+    { sentence: "وهنا ____، نلمس الأوتار ونسمع صوتًا رقيقًا.", answer: "القانون", image: "القانون.svg" },
+    { sentence: "انظروا! هذا ____، نحركه بأيدينا.", answer: "الدف", image: "الدف.svg" },
+    { sentence: "وهذا ____، ننفخ فيه ونسمع نغمات رقيقة.", answer: "الناي", image: "الناي.svg" },
+    { sentence: "هذا ____، نلمس الأوتار ونسمع لحنًا جميلًا.", answer: "العود", image: "العود.svg" },
+    { sentence: "وأخيرًا، هذه ____، نضربها بأيدينا ونسمع الإيقاع.", answer: "الطبلة", image: "الطبلة.svg" },
+    { sentence: "هذا ____، نراه كثيرًا في الحفلات والأغاني... صوته جميل!", answer: "الكمان", image: "الكمان.svg" },
+    { sentence: "هذه ____، نُحرِّكُ القَوسَ بلُطف وتَخرجُ نَغمةٌ حزينة.", answer: "الربابة", image: "الربابة.svg" }
+  ];
+
+/* =========================
+   APP LOGIC
+========================= */
+  // Card background image
+  document.documentElement.style.setProperty(
+    "--cardBgImage",
+    `url("${RAW_BASE_URL + encodeURIComponent(CARD_BG_IMAGE_FILE)}")`
+  );
+
+  // HUD
+  const logoImg = document.getElementById("logoImg");
+  const pageTitleEl = document.getElementById("pageTitle");
+  const cardIndexText = document.getElementById("cardIndexText");
+  const placedText = document.getElementById("placedText");
+  const scoreText = document.getElementById("scoreText");
+  const progressBar = document.getElementById("progressBar");
+
+  logoImg.src = LOGO_URL;
+  pageTitleEl.textContent = "ألعاب: آلات موسيقية";
+
+  // Cards
+  const card0 = document.getElementById("card0");
+  const card1 = document.getElementById("card1");
+  const card2 = document.getElementById("card2");
+  const card3 = document.getElementById("card3");
+  const card7 = document.getElementById("card7");
+  const card4 = document.getElementById("card4");
+
+  // Badges
+  const badge0 = document.getElementById("badge0");
+  const badge1 = document.getElementById("badge1");
+  const badge2 = document.getElementById("badge2");
+  const badge3 = document.getElementById("badge3");
+  const badge7 = document.getElementById("badge7");
+  const badge4 = document.getElementById("badge4");
+
+  function setBadge(cardEl, badgeEl, state){
+    if (!badgeEl) return;
+    if (!state){
+      badgeEl.style.display = "none";
+      badgeEl.textContent = "—";
+      cardEl.classList.remove("correct","incorrect");
+      return;
+    }
+    badgeEl.style.display = "inline-flex";
+    if (state === "correct"){
+      badgeEl.textContent = "Correct ✅";
+      cardEl.classList.add("correct");
+      cardEl.classList.remove("incorrect");
+    } else if (state === "incorrect") {
+      badgeEl.textContent = "Not correct ❌";
+      cardEl.classList.add("incorrect");
+      cardEl.classList.remove("correct");
+    } else {
+      badgeEl.textContent = "Done ✅";
+      cardEl.classList.remove("correct","incorrect");
+    }
+  }
+
+  // AUDIO
+  const audioCorrect = document.getElementById("audioCorrect");
+  const audioIncorrect = document.getElementById("audioIncorrect");
+  const hoverAudio = document.getElementById("hoverAudio");
+  const wordDoneAudio = document.getElementById("wordDoneAudio");
+  const memoryWordAudio = document.getElementById("memoryWordAudio");
+
+  function urlOf(fileName){
+    return RAW_BASE_URL + encodeURIComponent(fileName);
+  }
+
+  audioCorrect.src = urlOf(FEEDBACK_AUDIO.correct);
+  audioIncorrect.src = urlOf(FEEDBACK_AUDIO.incorrect);
+
+  function safePlay(audioEl, label){
+    try { audioEl.currentTime = 0; } catch(_) {}
+    const p = audioEl.play();
+    if (p && typeof p.catch === "function"){
+      p.catch((err) => {
+        console.warn("Audio play failed:", label, err, "SRC:", audioEl.src);
+        try { audioEl.load(); } catch(_) {}
+        setTimeout(() => {
+          try { audioEl.currentTime = 0; } catch(_) {}
+          audioEl.play().catch((err2) => console.warn("Audio retry failed:", label, err2, "SRC:", audioEl.src));
+        }, 120);
+      });
+    }
+  }
+
+  function stopAllAudio(){
+    [audioCorrect, audioIncorrect, hoverAudio, wordDoneAudio, memoryWordAudio].forEach(a => {
+      try { a.pause(); a.currentTime = 0; } catch(_) {}
+    });
+  }
+
+  function playFeedback(which){
+    try { audioCorrect.pause(); audioIncorrect.pause(); } catch(_) {}
+    if (which === "correct") safePlay(audioCorrect, "correct");
+    else safePlay(audioIncorrect, "incorrect");
+  }
+
+  let lastHoverKey = null;
+  function playHoverWord(word){
+    const file = WORD_AUDIO[word];
+    if (!file) return;
+    if (lastHoverKey === word && !hoverAudio.paused) return;
+    lastHoverKey = word;
+
+    try { hoverAudio.pause(); hoverAudio.currentTime = 0; } catch(_) {}
+    hoverAudio.src = urlOf(file);
+    safePlay(hoverAudio, `hover:${word}`);
+  }
+
+  function playWordCompleted(word){
+    const file = WORD_AUDIO[word];
+    if (!file) return;
+    try { wordDoneAudio.pause(); wordDoneAudio.currentTime = 0; } catch(_) {}
+    wordDoneAudio.src = urlOf(file);
+    safePlay(wordDoneAudio, `wordDone:${word}`);
+  }
+
+  function playMemoryWord(word){
+    const file = WORD_AUDIO[word];
+    if (!file) return;
+    try { memoryWordAudio.pause(); memoryWordAudio.currentTime = 0; } catch(_) {}
+    memoryWordAudio.src = urlOf(file);
+    safePlay(memoryWordAudio, `memory:${word}`);
+  }
+
+  // Utility
+  function shuffle(arr){
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function normalizeArabicForCompare(s){
+    return (s || "").replace(/[\u064B-\u065F\u0670\u0640]/g, "").trim();
+  }
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // =========================
+  // STATS
+  // =========================
+  const stats = {
+    c1Attempts: 0, c1Best: 0,
+    c2Attempts: 0, c2CorrectChecks: 0, c2IncorrectChecks: 0, c2Done: 0,
+    c3Attempts: 0, c3CorrectChecks: 0, c3IncorrectChecks: 0, c3Done: 0,
+    c7Moves: 0, c7Seconds: 0, c7Pairs: 0
+  };
+  function resetAllStats(){
+    stats.c1Attempts = 0; stats.c1Best = 0;
+    stats.c2Attempts = 0; stats.c2CorrectChecks = 0; stats.c2IncorrectChecks = 0; stats.c2Done = 0;
+    stats.c3Attempts = 0; stats.c3CorrectChecks = 0; stats.c3IncorrectChecks = 0; stats.c3Done = 0;
+    stats.c7Moves = 0; stats.c7Seconds = 0; stats.c7Pairs = 0;
+  }
+
+  // =========================
+  // NAV / HUD
+  // =========================
+  function showCard(key){
+    // key: "picker" | "match" | "letters" | "blank" | "memory" | "score"
+    card0.style.display = (key === "picker") ? "" : "none";
+    card1.style.display = (key === "match") ? "" : "none";
+    card2.style.display = (key === "letters") ? "" : "none";
+    card3.style.display = (key === "blank") ? "" : "none";
+    card7.style.display = (key === "memory") ? "" : "none";
+    card4.style.display = (key === "score") ? "" : "none";
+
+    const order = { picker:1, match:2, letters:3, blank:4, memory:5, score:6 };
+    const idx = order[key] || 1;
+    cardIndexText.textContent = `${idx}/${TOTAL_CARDS}`;
+    progressBar.style.width = `${(idx - 1) * 20}%`; // 0..100
+
+    if (key === "match") updateHudCard1();
+    if (key === "letters") updateHudCard2();
+    if (key === "blank") updateHudCard3();
+    if (key === "memory") updateHudCard7();
+    if (key === "picker"){
+      placedText.textContent = `0/7`;
+      scoreText.textContent = `0`;
+      setBadge(card0, badge0, null);
+    }
+  }
+
+  // =========================
+  // CARD 0: PICKER WIRES
+  // =========================
+  const helper0 = document.getElementById("helper0");
+  const quickStartBtn = document.getElementById("quickStartBtn");
+  const playAllBtn = document.getElementById("playAllBtn");
+  const resetAllBtn0 = document.getElementById("resetAllBtn0");
+
+  const goMatchBtn = document.getElementById("goMatchBtn");
+  const goLettersBtn = document.getElementById("goLettersBtn");
+  const goBlankBtn = document.getElementById("goBlankBtn");
+  const goMemoryBtn = document.getElementById("goMemoryBtn");
+  const goScoreBtn = document.getElementById("goScoreBtn");
+
+  function goMatch(){
+    renderCard1();
+    showCard("match");
+  }
+  function goLetters(){
+    currentIndex2 = 0;
+    showCard("letters");
+    loadWord2();
+  }
+  function goBlank(){
+    currentIndex3 = 0;
+    showCard("blank");
+    loadItem3();
+  }
+  function goMemory(){
+    showCard("memory");
+    resetMemory7(true);
+  }
+
+  quickStartBtn.addEventListener("click", () => goMatch());
+  goMatchBtn.addEventListener("click", () => goMatch());
+  goLettersBtn.addEventListener("click", () => goLetters());
+  goBlankBtn.addEventListener("click", () => goBlank());
+  goMemoryBtn.addEventListener("click", () => goMemory());
+  goScoreBtn.addEventListener("click", () => showScoreCard());
+
+  playAllBtn.addEventListener("click", () => {
+    helper0.textContent = "ابدأ بالترتيب الكامل…";
+    goMatch();
+  });
+
+  resetAllBtn0.addEventListener("click", () => {
+    stopAllAudio();
+    resetAllStats();
+    lastHoverKey = null;
+    helper0.textContent = "تمت إعادة كل شيء. اختر لعبة.";
+    setBadge(card0, badge0, "done");
+  });
+
+  // =========================
+  // CARD 1: MATCHING
+  // =========================
+  const wordChips1 = document.getElementById("wordChips1");
+  const imgGrid = document.getElementById("imgGrid");
+  const checkBtn1 = document.getElementById("checkBtn1");
+  const resetBtn1 = document.getElementById("resetBtn1");
+  const nextBtn1 = document.getElementById("nextBtn1");
+  const homeBtn1 = document.getElementById("homeBtn1");
+  const helper1 = document.getElementById("helper1");
+
+  let draggedWord1 = null;
+  const placed1 = new Array(CARD1_PAIRS.length).fill(null);
+  const chipByWord1 = new Map();
+
+  function updateHudCard1(){
+    const count = placed1.filter(Boolean).length;
+    placedText.textContent = `${count}/${CARD1_PAIRS.length}`;
+    checkBtn1.disabled = (count !== CARD1_PAIRS.length);
+    helper1.textContent = (count === CARD1_PAIRS.length) ? "جاهز. اضغط تحقّق." : "ضع كل الكلمات أولاً.";
+  }
+
+  function makeWordChip1(word){
+    const chip = document.createElement("div");
+    chip.className = "word";
+    chip.textContent = word;
+    chip.draggable = true;
+
+    chip.addEventListener("mouseenter", () => {
+      if (chip.getAttribute("aria-disabled") === "true") return;
+      playHoverWord(word);
+    });
+    chip.addEventListener("dragstart", (e) => {
+      if (chip.getAttribute("aria-disabled") === "true") return;
+      draggedWord1 = word;
+      e.dataTransfer.setData("text/plain", word);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    chip.addEventListener("click", () => {
+      if (chip.getAttribute("aria-disabled") === "true") return;
+      draggedWord1 = word;
+      helper1.textContent = `تم اختيار: ${word}. الآن ضعها على صورة.`;
+    });
+
+    chipByWord1.set(word, chip);
+    return chip;
+  }
+
+  function returnFromSlot1(i){
+    const w = placed1[i];
+    if (!w) return;
+    placed1[i] = null;
+
+    const chip = chipByWord1.get(w);
+    if (chip){
+      chip.setAttribute("aria-disabled","false");
+      chip.draggable = true;
+      chip.style.opacity = "1";
+    }
+    const slotTextEl = document.querySelector(`[data-slot1="${i}"]`);
+    if (slotTextEl) slotTextEl.textContent = "____";
+
+    setBadge(card1, badge1, null);
+    scoreText.textContent = "0";
+    updateHudCard1();
+  }
+
+  function placeWord1(word, i){
+    const usedAt = placed1.indexOf(word);
+    if (usedAt !== -1){
+      helper1.textContent = "هذه الكلمة مستخدمة بالفعل. أرجعها أولاً.";
+      return;
+    }
+
+    const prev = placed1[i];
+    if (prev){
+      const prevChip = chipByWord1.get(prev);
+      if (prevChip){
+        prevChip.setAttribute("aria-disabled","false");
+        prevChip.draggable = true;
+        prevChip.style.opacity = "1";
+      }
+    }
+
+    placed1[i] = word;
+
+    const chip = chipByWord1.get(word);
+    if (chip){
+      chip.setAttribute("aria-disabled","true");
+      chip.draggable = false;
+      chip.style.opacity = ".65";
+    }
+
+    const slotTextEl = document.querySelector(`[data-slot1="${i}"]`);
+    if (slotTextEl) slotTextEl.textContent = word;
+
+    setBadge(card1, badge1, null);
+    scoreText.textContent = "0";
+    updateHudCard1();
+  }
+
+  function wireSlot1(slotEl, i){
+    slotEl.addEventListener("dragover", (e) => { e.preventDefault(); slotEl.classList.add("dragover"); });
+    slotEl.addEventListener("dragleave", () => slotEl.classList.remove("dragover"));
+    slotEl.addEventListener("drop", (e) => {
+      e.preventDefault(); slotEl.classList.remove("dragover");
+      const w = e.dataTransfer.getData("text/plain") || draggedWord1;
+      if (!w) return;
+      placeWord1(w, i);
+    });
+    slotEl.addEventListener("click", (e) => {
+      if (e.target && e.target.classList && e.target.classList.contains("returnBtn")) return;
+      if (!draggedWord1) return;
+      placeWord1(draggedWord1, i);
+    });
+  }
+
+  function renderCard1(){
+    setBadge(card1, badge1, null);
+    scoreText.textContent = "0";
+    for (let i=0;i<placed1.length;i++) placed1[i] = null;
+
+    wordChips1.innerHTML = "";
+    imgGrid.innerHTML = "";
+    chipByWord1.clear();
+
+    shuffle(CARD1_PAIRS.map(p=>p.word)).forEach(w => wordChips1.appendChild(makeWordChip1(w)));
+
+    CARD1_PAIRS.forEach((p, i) => {
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      const imgSrc = RAW_BASE_URL + encodeURIComponent(p.file);
+      tile.innerHTML = `
+        <div class="imgBox"><img src="${imgSrc}" alt="${p.word}" loading="lazy"></div>
+        <div class="dropSlot" id="slot1-${i}">
+          <div class="slotText" data-slot1="${i}">____</div>
+          <div><button class="returnBtn" type="button">إرجاع</button></div>
+        </div>
+      `;
+      imgGrid.appendChild(tile);
+
+      const slotEl = tile.querySelector(`#slot1-${i}`);
+      wireSlot1(slotEl, i);
+      tile.querySelector(".returnBtn").addEventListener("click", () => returnFromSlot1(i));
+    });
+
+    updateHudCard1();
+  }
+
+  function checkCard1(){
+    if (!placed1.every(Boolean)) return;
+    stats.c1Attempts += 1;
+
+    let correctCount = 0;
+    placed1.forEach((w, i) => { if (w === CARD1_PAIRS[i].word) correctCount++; });
+    scoreText.textContent = String(correctCount);
+    stats.c1Best = Math.max(stats.c1Best, correctCount);
+
+    if (correctCount === CARD1_PAIRS.length){
+      helper1.textContent = "أحسنت!";
+      setBadge(card1, badge1, "correct");
+      playFeedback("correct");
+    } else {
+      helper1.textContent = "حاول مرة أخرى.";
+      setBadge(card1, badge1, "incorrect");
+      playFeedback("incorrect");
+    }
+  }
+
+  checkBtn1.addEventListener("click", checkCard1);
+  resetBtn1.addEventListener("click", () => { stopAllAudio(); lastHoverKey=null; renderCard1(); });
+  nextBtn1.addEventListener("click", () => { currentIndex2 = 0; showCard("letters"); loadWord2(); });
+  homeBtn1.addEventListener("click", () => showCard("picker"));
+
+  // =========================
+  // CARD 2: LETTERS
+  // =========================
+  const helper2 = document.getElementById("helper2");
+  const backBtn2 = document.getElementById("backBtn2");
+  const homeBtn2 = document.getElementById("homeBtn2");
+  const wordStep2 = document.getElementById("wordStep2");
+  const lettersBank2 = document.getElementById("lettersBank2");
+  const answerLine2 = document.getElementById("answerLine2");
+  const bankCount2 = document.getElementById("bankCount2");
+  const answerText2 = document.getElementById("answerText2");
+  const checkBtn2 = document.getElementById("checkBtn2");
+  const resetBtn2 = document.getElementById("resetBtn2");
+  const nextWordBtn2 = document.getElementById("nextWordBtn2");
+  const wordImage2 = document.getElementById("wordImage2");
+  const hintRow2 = document.getElementById("hintRow2");
+  const hintWord2 = document.getElementById("hintWord2");
+
+  let currentIndex2 = 0;
+  let draggedLetter2 = null;
+
+  function updateHudCard2(){
+    const total = CARD2_WORDS.length;
+    placedText.textContent = `${stats.c2Done}/${total}`;
+
+    wordStep2.textContent = `Word ${currentIndex2 + 1}/${total}`;
+    const bankN = lettersBank2.querySelectorAll(".letter").length;
+    const ansStr = [...answerLine2.querySelectorAll(".letter")].map(x => x.textContent).join("");
+    bankCount2.textContent = `${bankN}`;
+    answerText2.textContent = ansStr ? ansStr : "—";
+    checkBtn2.disabled = (answerLine2.querySelectorAll(".letter").length === 0);
+  }
+
+  function scrambleLetters(word){
+    const chars = [...word];
+    if (chars.length <= 2) return shuffle(chars);
+    let s = shuffle(chars);
+    if (s.join("") === chars.join("")) s = shuffle(chars);
+    return s;
+  }
+
+  function hideHint2(){ hintRow2.classList.remove("show"); hintWord2.textContent = "—"; }
+  function showHint2(word){ hintRow2.classList.add("show"); hintWord2.textContent = word; }
+
+  function setWordImage2(word){
+    wordImage2.src = RAW_BASE_URL + encodeURIComponent((CARD2_HINT_IMAGE[word] || `${word}.svg`));
+  }
+
+  function makeLetterChip2(ch){
+    const el = document.createElement("div");
+    el.className = "letter";
+    el.textContent = ch;
+    el.draggable = true;
+
+    el.addEventListener("dragstart", (e) => {
+      draggedLetter2 = el;
+      e.dataTransfer.setData("text/plain", ch);
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    el.addEventListener("click", () => {
+      if (el.parentElement === lettersBank2) answerLine2.appendChild(el);
+      else lettersBank2.appendChild(el);
+
+      setBadge(card2, badge2, null);
+      scoreText.textContent = "0";
+      nextWordBtn2.disabled = true;
+      updateHudCard2();
+    });
+
+    return el;
+  }
+
+  function wireDropLine2(lineEl){
+    lineEl.addEventListener("dragover", (e) => { e.preventDefault(); lineEl.classList.add("dragover"); });
+    lineEl.addEventListener("dragleave", () => lineEl.classList.remove("dragover"));
+    lineEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      lineEl.classList.remove("dragover");
+      if (!draggedLetter2) return;
+
+      lineEl.appendChild(draggedLetter2);
+      draggedLetter2 = null;
+
+      setBadge(card2, badge2, null);
+      scoreText.textContent = "0";
+      nextWordBtn2.disabled = true;
+      updateHudCard2();
+    });
+  }
+  wireDropLine2(lettersBank2);
+  wireDropLine2(answerLine2);
+
+  function loadWord2(){
+    stopAllAudio();
+    setBadge(card2, badge2, null);
+    scoreText.textContent = "0";
+    nextWordBtn2.disabled = true;
+    hideHint2();
+
+    const word = CARD2_WORDS[currentIndex2];
+    setWordImage2(word);
+
+    lettersBank2.innerHTML = "";
+    answerLine2.innerHTML = "";
+    scrambleLetters(word).forEach(ch => lettersBank2.appendChild(makeLetterChip2(ch)));
+
+    helper2.textContent = "رتّب الحروف لتكوين الكلمة.";
+    updateHudCard2();
+  }
+
+  function checkCard2(){
+    const target = CARD2_WORDS[currentIndex2];
+    const attempt = [...answerLine2.querySelectorAll(".letter")].map(x => x.textContent).join("");
+
+    stats.c2Attempts += 1;
+    const ok = normalizeArabicForCompare(attempt) === normalizeArabicForCompare(target);
+
+    if (ok){
+      stats.c2CorrectChecks += 1;
+      helper2.textContent = "أحسنت! اسمع الكلمة ثم اضغط التالي.";
+      setBadge(card2, badge2, "correct");
+      scoreText.textContent = "1";
+      nextWordBtn2.disabled = false;
+      hideHint2();
+
+      playFeedback("correct");
+      setTimeout(() => playWordCompleted(target), 900);
+    } else {
+      stats.c2IncorrectChecks += 1;
+      helper2.textContent = "حاول مرة أخرى. شاهد تلميح الكلمة.";
+      setBadge(card2, badge2, "incorrect");
+      scoreText.textContent = "0";
+      nextWordBtn2.disabled = true;
+
+      playFeedback("incorrect");
+      showHint2(target);
+    }
+  }
+
+  function nextWord2(){
+    const total = CARD2_WORDS.length;
+    stats.c2Done = Math.max(stats.c2Done, currentIndex2 + 1);
+
+    if (currentIndex2 < total - 1){
+      currentIndex2++;
+      loadWord2();
+    } else {
+      currentIndex3 = 0;
+      showCard("blank");
+      loadItem3();
+    }
+  }
+
+  checkBtn2.addEventListener("click", checkCard2);
+  resetBtn2.addEventListener("click", () => { stopAllAudio(); lastHoverKey=null; loadWord2(); });
+  nextWordBtn2.addEventListener("click", nextWord2);
+  backBtn2.addEventListener("click", () => showCard("match"));
+  homeBtn2.addEventListener("click", () => showCard("picker"));
+
+  // =========================
+  // CARD 3: FILL BLANK
+  // =========================
+  const helper3 = document.getElementById("helper3");
+  const step3 = document.getElementById("step3");
+  const blankStatus3 = document.getElementById("blankStatus3");
+  const sentence3 = document.getElementById("sentence3");
+  const sentenceImg3 = document.getElementById("sentenceImg3");
+  const bank3 = document.getElementById("bank3");
+
+  const checkBtn3 = document.getElementById("checkBtn3");
+  const resetBtn3 = document.getElementById("resetBtn3");
+  const nextBtn3 = document.getElementById("nextBtn3");
+  const backBtn3 = document.getElementById("backBtn3");
+  const homeBtn3 = document.getElementById("homeBtn3");
+
+  let currentIndex3 = 0;
+  let draggedWord3 = null;
+
+  function updateHudCard3(){
+    const total = CARD3_ITEMS.length;
+    placedText.textContent = `${stats.c3Done}/${total}`;
+    step3.textContent = `Sentence ${currentIndex3 + 1}/${total}`;
+
+    const placed = getBlankValue3();
+    blankStatus3.textContent = placed ? placed : "—";
+    checkBtn3.disabled = !placed;
+  }
+
+  function makeBankChip3(word){
+    const chip = document.createElement("div");
+    chip.className = "word";
+    chip.textContent = word;
+    chip.draggable = true;
+
+    chip.addEventListener("mouseenter", () => playHoverWord(word));
+    chip.addEventListener("dragstart", (e) => {
+      draggedWord3 = word;
+      e.dataTransfer.setData("text/plain", word);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    chip.addEventListener("click", () => {
+      const slot = document.getElementById("blankSlot3");
+      if (!slot) return;
+      if (getBlankValue3()) return;
+      placeIntoBlank3(word);
+    });
+
+    return chip;
+  }
+
+  function renderBank3(){
+    bank3.innerHTML = "";
+    shuffle(CARD3_BANK_WORDS).forEach(w => bank3.appendChild(makeBankChip3(w)));
+  }
+
+  function getBlankValue3(){
+    const el = document.getElementById("blankValue3");
+    return el ? (el.textContent || "").trim() : "";
+  }
+
+  function clearBlank3(){
+    const el = document.getElementById("blankValue3");
+    if (el) el.textContent = "";
+    [...bank3.querySelectorAll(".word")].forEach(ch => {
+      ch.setAttribute("aria-disabled","false");
+      ch.draggable = true;
+      ch.style.opacity = "1";
+    });
+    nextBtn3.disabled = true;
+    setBadge(card3, badge3, null);
+    scoreText.textContent = "0";
+    updateHudCard3();
+  }
+
+  function placeIntoBlank3(word){
+    const valEl = document.getElementById("blankValue3");
+    if (!valEl) return;
+    if (valEl.textContent.trim()) return;
+    valEl.textContent = word;
+
+    [...bank3.querySelectorAll(".word")].forEach(ch => {
+      if (ch.textContent.trim() === word){
+        ch.setAttribute("aria-disabled","true");
+        ch.draggable = false;
+        ch.style.opacity = ".65";
+      }
+    });
+
+    setBadge(card3, badge3, null);
+    scoreText.textContent = "0";
+    nextBtn3.disabled = true;
+    updateHudCard3();
+  }
+
+  function loadItem3(){
+    stopAllAudio();
+    setBadge(card3, badge3, null);
+    scoreText.textContent = "0";
+    nextBtn3.disabled = true;
+
+    const item = CARD3_ITEMS[currentIndex3];
+    sentenceImg3.src = RAW_BASE_URL + encodeURIComponent(item.image || `${item.answer}.svg`);
+
+    const parts = item.sentence.split("____");
+    const before = parts[0] ?? "";
+    const after = parts.slice(1).join("____") ?? "";
+
+    sentence3.innerHTML = `
+      ${escapeHtml(before)}
+      <span class="blankSlot" id="blankSlot3">
+        <span class="blankValue" id="blankValue3"></span>
+        <button class="returnBtn" type="button" id="returnBlank3">إرجاع</button>
+      </span>
+      ${escapeHtml(after)}
+    `;
+
+    const slot = document.getElementById("blankSlot3");
+    const returnBtn = document.getElementById("returnBlank3");
+
+    slot.addEventListener("dragover", (e) => { e.preventDefault(); slot.classList.add("dragover"); });
+    slot.addEventListener("dragleave", () => slot.classList.remove("dragover"));
+    slot.addEventListener("drop", (e) => {
+      e.preventDefault();
+      slot.classList.remove("dragover");
+      const w = e.dataTransfer.getData("text/plain") || draggedWord3;
+      if (!w) return;
+      placeIntoBlank3(w);
+    });
+
+    slot.addEventListener("click", (e) => {
+      if (e.target && e.target.id === "returnBlank3") return;
+      if (!draggedWord3) return;
+      placeIntoBlank3(draggedWord3);
+    });
+
+    returnBtn.addEventListener("click", clearBlank3);
+
+    renderBank3();
+    helper3.textContent = "اسحب كلمة واحدة إلى الفراغ.";
+    updateHudCard3();
+  }
+
+  function checkCard3(){
+    const item = CARD3_ITEMS[currentIndex3];
+    const placed = getBlankValue3();
+
+    stats.c3Attempts += 1;
+    const ok = normalizeArabicForCompare(placed) === normalizeArabicForCompare(item.answer);
+
+    if (ok){
+      stats.c3CorrectChecks += 1;
+      helper3.textContent = "أحسنت! اسمع الكلمة ثم اضغط التالي.";
+      setBadge(card3, badge3, "correct");
+      scoreText.textContent = "1";
+      nextBtn3.disabled = false;
+
+      playFeedback("correct");
+      setTimeout(() => playWordCompleted(item.answer), 900);
+    } else {
+      stats.c3IncorrectChecks += 1;
+      helper3.textContent = "حاول مرة أخرى.";
+      setBadge(card3, badge3, "incorrect");
+      scoreText.textContent = "0";
+      nextBtn3.disabled = true;
+
+      playFeedback("incorrect");
+    }
+  }
+
+  function nextItem3(){
+    const total = CARD3_ITEMS.length;
+    stats.c3Done = Math.max(stats.c3Done, currentIndex3 + 1);
+
+    if (currentIndex3 < total - 1){
+      currentIndex3++;
+      loadItem3();
+    } else {
+      showCard("memory");
+      resetMemory7(true);
+    }
+  }
+
+  checkBtn3.addEventListener("click", checkCard3);
+  resetBtn3.addEventListener("click", () => { stopAllAudio(); lastHoverKey=null; loadItem3(); });
+  nextBtn3.addEventListener("click", nextItem3);
+  backBtn3.addEventListener("click", () => showCard("letters"));
+  homeBtn3.addEventListener("click", () => showCard("picker"));
+
+  // =========================
+  // CARD 7: MEMORY / FLIP
+  // =========================
+  const memoryGrid7 = document.getElementById("memoryGrid7");
+  const pairsPill7 = document.getElementById("pairsPill7");
+  const movesPill7 = document.getElementById("movesPill7");
+  const timePill7  = document.getElementById("timePill7");
+  const helper7 = document.getElementById("helper7");
+  const restartBtn7 = document.getElementById("restartBtn7");
+  const revealBtn7 = document.getElementById("revealBtn7");
+  const nextBtn7 = document.getElementById("nextBtn7");
+  const backBtn7 = document.getElementById("backBtn7");
+  const homeBtn7 = document.getElementById("homeBtn7");
+
+  let deck7 = [];
+  let firstPick7 = null;
+  let secondPick7 = null;
+  let lock7 = false;
+  let matchedPairs7 = 0;
+  let moves7 = 0;
+
+  let timer7 = null;
+  let seconds7 = 0;
+  let timerStarted7 = false;
+
+  function updateHudCard7(){
+    placedText.textContent = `${matchedPairs7}/7`;
+    pairsPill7.textContent = `Pairs ${matchedPairs7}/7`;
+    movesPill7.textContent = `Moves ${moves7}`;
+    timePill7.textContent  = `Time ${seconds7}s`;
+  }
+
+  function startTimer7IfNeeded(){
+    if (timerStarted7) return;
+    timerStarted7 = true;
+    timer7 = setInterval(() => {
+      seconds7++;
+      stats.c7Seconds = seconds7;
+      updateHudCard7();
+    }, 1000);
+  }
+  function stopTimer7(){
+    if (timer7) clearInterval(timer7);
+    timer7 = null;
+    timerStarted7 = false;
+  }
+
+  function flip7(el, yes){
+    if (yes) el.classList.add("isFlipped");
+    else el.classList.remove("isFlipped");
+  }
+  function isMatched7(el){ return el.classList.contains("matched"); }
+  function markMatched7(el){ el.classList.add("matched"); }
+
+  function buildDeck7(){
+    const cards = [];
+    let id = 0;
+    for (const w of WORDS){
+      cards.push({ type:"img",  key:w, id:`m${id++}` });
+      cards.push({ type:"word", key:w, id:`m${id++}` });
+    }
+    return shuffle(cards);
+  }
+
+  function makeMemoryCard7(card){
+    const wrap = document.createElement("div");
+    wrap.className = "card3d";
+    wrap.dataset.type = card.type;
+    wrap.dataset.key = card.key;
+    wrap.dataset.id = card.id;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "flipBtn";
+    btn.setAttribute("aria-label", "Flip card");
+
+    const inner = document.createElement("div");
+    inner.className = "inner3d";
+
+    const front = document.createElement("div");
+    front.className = "face3d front3d";
+    front.innerHTML = `<div class="mark">؟</div>`;
+
+    const back = document.createElement("div");
+    back.className = "face3d back3d";
+
+    if (card.type === "img"){
+      const img = document.createElement("img");
+      img.className = "backImg";
+      img.alt = card.key;
+      img.loading = "lazy";
+      img.src = RAW_BASE_URL + encodeURIComponent(`${card.key}.svg`);
+      back.appendChild(img);
+    } else {
+      const w = document.createElement("div");
+      w.className = "backWord";
+      w.textContent = card.key;
+      back.appendChild(w);
+    }
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    btn.appendChild(inner);
+    wrap.appendChild(btn);
+
+    btn.addEventListener("click", () => onFlip7(wrap));
+    return wrap;
+  }
+
+  function resetPicks7(){ firstPick7 = null; secondPick7 = null; }
+
+  function onFlip7(cardEl){
+    if (lock7) return;
+    if (isMatched7(cardEl)) return;
+
+    startTimer7IfNeeded();
+    if (firstPick7 && cardEl.dataset.id === firstPick7.dataset.id) return;
+
+    flip7(cardEl, true);
+
+    if (!firstPick7){
+      firstPick7 = cardEl;
+      helper7.textContent = "اختر بطاقة ثانية.";
+      setBadge(card7, badge7, null);
+      return;
+    }
+
+    secondPick7 = cardEl;
+    moves7++;
+    stats.c7Moves = moves7;
+    updateHudCard7();
+
+    const k1 = firstPick7.dataset.key;
+    const k2 = secondPick7.dataset.key;
+    const t1 = firstPick7.dataset.type;
+    const t2 = secondPick7.dataset.type;
+
+    const isPair = (k1 === k2) && ((t1 === "img" && t2 === "word") || (t1 === "word" && t2 === "img"));
+    lock7 = true;
+
+    if (isPair){
+      setTimeout(() => {
+        markMatched7(firstPick7);
+        markMatched7(secondPick7);
+        matchedPairs7++;
+        stats.c7Pairs = matchedPairs7;
+
+        helper7.textContent = `أحسنت! ${k1}`;
+        setBadge(card7, badge7, "correct");
+        playFeedback("correct");
+        setTimeout(() => playMemoryWord(k1), 700);
+
+        lock7 = false;
+        resetPicks7();
+        updateHudCard7();
+
+        if (matchedPairs7 === 7){
+          stopTimer7();
+          helper7.textContent = `ممتاز! أنهيت اللعبة 🎉 (Moves: ${moves7}, Time: ${seconds7}s)`;
+          nextBtn7.disabled = false;
+          setBadge(card7, badge7, "done");
+        }
+      }, 280);
+    } else {
+      setTimeout(() => {
+        setBadge(card7, badge7, "incorrect");
+        playFeedback("incorrect");
+        helper7.textContent = "ليس زوجًا. جرّب مرة أخرى.";
+
+        flip7(firstPick7, false);
+        flip7(secondPick7, false);
+
+        lock7 = false;
+        resetPicks7();
+        updateHudCard7();
+      }, 850);
+    }
+  }
+
+  function renderMemory7(){
+    memoryGrid7.innerHTML = "";
+    deck7.forEach(card => memoryGrid7.appendChild(makeMemoryCard7(card)));
+  }
+
+  function resetMemory7(forceNew){
+    stopAllAudio();
+    if (forceNew){
+      stopTimer7();
+      seconds7 = 0;
+      timerStarted7 = false;
+    }
+
+    setBadge(card7, badge7, null);
+    nextBtn7.disabled = true;
+    helper7.textContent = "ابدأ بالضغط على بطاقة.";
+
+    lock7 = false;
+    resetPicks7();
+
+    matchedPairs7 = 0;
+    moves7 = 0;
+
+    stats.c7Pairs = 0;
+    stats.c7Moves = 0;
+    stats.c7Seconds = seconds7;
+
+    deck7 = buildDeck7();
+    renderMemory7();
+    updateHudCard7();
+  }
+
+  function quickReveal7(){
+    if (lock7) return;
+    lock7 = true;
+    helper7.textContent = "كشف سريع 👀";
+
+    [...memoryGrid7.children].forEach(el => { if (!isMatched7(el)) flip7(el, true); });
+    setTimeout(() => {
+      [...memoryGrid7.children].forEach(el => { if (!isMatched7(el)) flip7(el, false); });
+      helper7.textContent = "تابع.";
+      lock7 = false;
+    }, 1600);
+  }
+
+  restartBtn7.addEventListener("click", () => resetMemory7(true));
+  revealBtn7.addEventListener("click", quickReveal7);
+  nextBtn7.addEventListener("click", () => showScoreCard());
+  backBtn7.addEventListener("click", () => showCard("blank"));
+  homeBtn7.addEventListener("click", () => showCard("picker"));
+
+  // =========================
+  // SCORE CARD
+  // =========================
+  const sc1Best = document.getElementById("sc1Best");
+  const sc1Attempts = document.getElementById("sc1Attempts");
+  const sc2Done = document.getElementById("sc2Done");
+  const sc2Acc = document.getElementById("sc2Acc");
+  const sc3Done = document.getElementById("sc3Done");
+  const sc3Acc = document.getElementById("sc3Acc");
+  const sc7Pairs = document.getElementById("sc7Pairs");
+  const sc7MovesTime = document.getElementById("sc7MovesTime");
+  const scCombined = document.getElementById("scCombined");
+  const scAttemptsAll = document.getElementById("scAttemptsAll");
+  const summaryLine = document.getElementById("summaryLine");
+
+  const playAgainBtn = document.getElementById("playAgainBtn");
+  const homeBtnScore = document.getElementById("homeBtnScore");
+  const goCard1Btn = document.getElementById("goCard1Btn");
+  const goCard2Btn = document.getElementById("goCard2Btn");
+  const goCard3Btn = document.getElementById("goCard3Btn");
+  const goCard7Btn = document.getElementById("goCard7Btn");
+
+  function showScoreCard(){
+    stopAllAudio();
+    stopTimer7();
+
+    const c1Total = CARD1_PAIRS.length;
+    const c2Total = CARD2_WORDS.length;
+    const c3Total = CARD3_ITEMS.length;
+    const c7Total = 7;
+
+    const c2Checks = stats.c2CorrectChecks + stats.c2IncorrectChecks;
+    const c2Accuracy = c2Checks === 0 ? 0 : Math.round((stats.c2CorrectChecks / c2Checks) * 100);
+
+    const c3Checks = stats.c3CorrectChecks + stats.c3IncorrectChecks;
+    const c3Accuracy = c3Checks === 0 ? 0 : Math.round((stats.c3CorrectChecks / c3Checks) * 100);
+
+    const c2Completed = Math.min(stats.c2Done, c2Total);
+    const c3Completed = Math.min(stats.c3Done, c3Total);
+    const c7Completed = Math.min(stats.c7Pairs, c7Total);
+
+    const combinedTotal = c1Total + c2Total + c3Total + c7Total; // 28
+    const combinedScore = stats.c1Best + c2Completed + c3Completed + c7Completed;
+    const combinedPct = Math.round((combinedScore / combinedTotal) * 100);
+
+    const attemptsAll = stats.c1Attempts + stats.c2Attempts + stats.c3Attempts + stats.c7Moves;
+
+    sc1Best.textContent = `${stats.c1Best}/${c1Total}`;
+    sc1Attempts.textContent = String(stats.c1Attempts);
+
+    sc2Done.textContent = `${c2Completed}/${c2Total}`;
+    sc2Acc.textContent = `${c2Accuracy}%`;
+
+    sc3Done.textContent = `${c3Completed}/${c3Total}`;
+    sc3Acc.textContent = `${c3Accuracy}%`;
+
+    sc7Pairs.textContent = `${c7Completed}/${c7Total}`;
+    sc7MovesTime.textContent = `${stats.c7Moves} • ${stats.c7Seconds}s`;
+
+    scCombined.textContent = `${combinedScore}/${combinedTotal}`;
+    scAttemptsAll.textContent = String(attemptsAll);
+
+    summaryLine.textContent =
+      `المجموع: ${combinedPct}% — مطابقة (أفضل): ${stats.c1Best}/${c1Total} — ترتيب: ${c2Completed}/${c2Total} — فراغ: ${c3Completed}/${c3Total} — ذاكرة: ${c7Completed}/${c7Total}`;
+
+    placedText.textContent = `${combinedScore}/${combinedTotal}`;
+    scoreText.textContent = String(combinedScore);
+    progressBar.style.width = "100%";
+
+    setBadge(card4, badge4, "done");
+    showCard("score");
+  }
+
+  playAgainBtn.addEventListener("click", () => {
+    resetAllStats();
+    stopAllAudio();
+    stopTimer7();
+    seconds7 = 0;
+    lastHoverKey = null;
+
+    renderCard1();
+    currentIndex2 = 0;
+    currentIndex3 = 0;
+
+    showCard("picker");
+  });
+
+  homeBtnScore.addEventListener("click", () => showCard("picker"));
+
+  goCard1Btn.addEventListener("click", () => { renderCard1(); showCard("match"); });
+  goCard2Btn.addEventListener("click", () => { currentIndex2 = 0; showCard("letters"); loadWord2(); });
+  goCard3Btn.addEventListener("click", () => { currentIndex3 = 0; showCard("blank"); loadItem3(); });
+  goCard7Btn.addEventListener("click", () => { showCard("memory"); resetMemory7(false); });
+
+  // INIT
+  renderCard1();           // keep ready
+  showCard("picker");      // start at picker
+  lucide.createIcons();
+</script>
+</body>
+</html>
